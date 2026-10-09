@@ -5,18 +5,21 @@ class CalculatorTool(BaseTool):
 
     name: str = "Calculator"
 
-    description: str = (
-        "Useful for mathematical calculations. "
-        "Input should be a mathematical expression."
-    )
-
+    description: str = """
+    Useful for solving mathematical calculations.
+    Input should be a mathematical expression.
+    Example:
+    25*10
+    """
 
     def _run(self, expression: str):
 
         try:
-            result = eval(expression)
-            return str(result)
+
+            answer = eval(expression)
+
+            return str(answer)
 
         except Exception:
 
-            return "Unable to calculate expression."
+            return "Cannot calculate this expression."
