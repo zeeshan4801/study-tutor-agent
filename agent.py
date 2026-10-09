@@ -1,95 +1,122 @@
-import os
+from crewai import Agent, Task, Crew, LLM
 
-from crewai import Agent, Task, Crew, Process
-from groq import Groq
-from dotenv import load_dotenv
+from config import GROQ_API_KEY
+
+from tools import CalculatorTool
+
+from memory import get_memory
 
 
-load_dotenv()
 
+llm = LLM(
 
-client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
+    model="groq/openai/gpt-oss-120b",
+
+    api_key=GROQ_API_KEY,
+
+    temperature=0.3
+
 )
 
 
-class GroqLLM:
 
-    def call(self, prompt):
-
-        response = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
-
-            messages=[
-                {
-                    "role":"user",
-                    "content":prompt
-                }
-            ]
-        )
-
-        return response.choices[0].message.content
+calculator = CalculatorTool()
 
 
 
-llm = GroqLLM()
+def create_study_agent():
 
 
-
-def create_tutor_agent():
-
-    tutor = Agent(
+    agent = Agent(
 
         role="AI Study Tutor",
 
         goal="""
-        Help students learn concepts,
-        create study plans,
-        generate quizzes,
-        and explain difficult topics.
+        Help students understand difficult concepts,
+        create study plans, explain topics,
+        and generate quizzes.
         """,
 
         backstory="""
-        You are a patient teacher.
-        You explain everything in simple language.
-        You use examples and practical explanations.
+        You are a friendly expert teacher.
+        You explain concepts step by step.
+        You use simple language,
+        examples and practical explanations.
         """,
 
-        llm=llm
+        llm=llm,
+
+        tools=[calculator],
+
+        verbose=False
 
     )
 
 
-    return tutor
+    return agent
 
 
 
 def ask_tutor(question):
 
-    tutor=create_tutor_agent()
+
+    agent=create_study_agent()
+
+
+    previous = get_memory()
+
+
+    context=""
+
+
+    if previous:
+
+        context=f"""
+        Previous conversation:
+
+        {previous}
+        """
+
 
 
     task=Task(
 
-        description=question,
+        description=f"""
 
-        expected_output="""
-        A clear educational answer
-        with examples and explanation.
+        {context}
+
+
+        Student question:
+
+        {question}
+
+
+        Answer like a professional tutor.
+
+        Include:
+        - Simple explanation
+        - Examples
+        - Summary
+
         """,
 
-        agent=tutor
+        expected_output="""
+
+        A clear educational answer.
+
+        """,
+
+        agent=agent
 
     )
 
 
+
     crew=Crew(
 
-        agents=[tutor],
+        agents=[agent],
 
         tasks=[task],
-
-        process=Process.sequential
 
     )
 
@@ -97,4 +124,4 @@ def ask_tutor(question):
     result=crew.kickoff()
 
 
-    return result
+    return str(result)
