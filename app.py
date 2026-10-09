@@ -23,7 +23,12 @@ st.markdown(
 
 .stApp{
 
-background:#020617;
+background:
+linear-gradient(
+135deg,
+#020617,
+#0f172a
+);
 
 }
 
@@ -31,17 +36,16 @@ background:#020617;
 h1{
 
 color:#38bdf8;
-
 text-align:center;
 
 }
 
 
-button{
+.stButton button{
 
-background:#06b6d4!important;
-
-color:white!important;
+background:#06b6d4;
+color:white;
+border-radius:12px;
 
 }
 
@@ -56,8 +60,18 @@ unsafe_allow_html=True
 st.title("📚 Study Tutor AI")
 
 
+st.write(
+"Your AI powered learning companion 🚀"
+)
+
+
+
 question = st.text_area(
-"Ask your question"
+
+    "Ask your question",
+
+    height=120
+
 )
 
 
@@ -69,7 +83,7 @@ if st.button("Ask Tutor"):
 
 
         with st.spinner(
-            "Thinking..."
+            "Tutor is thinking..."
         ):
 
 
@@ -91,11 +105,14 @@ if st.button("Ask Tutor"):
             )
 
 
-        st.success(answer)
+        st.success("Answer")
+
+        st.write(answer)
+
 
 
     else:
 
         st.warning(
-            "Enter a question"
+            "Please enter a question"
         )
