@@ -6,20 +6,18 @@ class CalculatorTool(BaseTool):
     name: str = "Calculator"
 
     description: str = """
-    Useful for solving mathematical calculations.
-    Input should be a mathematical expression.
-    Example:
-    25*10
+    Use this tool for mathematical calculations.
+    Example input:
+    25*5
     """
+
 
     def _run(self, expression: str):
 
         try:
 
-            answer = eval(expression)
+            return str(eval(expression))
 
-            return str(answer)
+        except:
 
-        except Exception:
-
-            return "Cannot calculate this expression."
+            return "Calculation error"
