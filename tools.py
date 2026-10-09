@@ -3,18 +3,20 @@ from crewai.tools import BaseTool
 
 class CalculatorTool(BaseTool):
 
-    name="Calculator"
+    name: str = "Calculator"
 
-    description="""
-    Performs mathematical calculations.
-    """
+    description: str = (
+        "Useful for mathematical calculations. "
+        "Input should be a mathematical expression."
+    )
 
 
-    def _run(self, expression:str):
+    def _run(self, expression: str):
 
         try:
-            return str(eval(expression))
+            result = eval(expression)
+            return str(result)
 
-        except:
+        except Exception:
 
-            return "Invalid calculation"
+            return "Unable to calculate expression."
