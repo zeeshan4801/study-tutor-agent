@@ -1,10 +1,12 @@
 from crewai import Agent, Task, Crew, LLM
 
-from config import GROQ_API_KEY
+from config import get_groq_key
 
 from tools import CalculatorTool
 
-from memory import get_memory
+
+
+API_KEY = get_groq_key()
 
 
 
@@ -12,7 +14,7 @@ llm = LLM(
 
     model="groq/openai/gpt-oss-120b",
 
-    api_key=GROQ_API_KEY,
+    api_key=API_KEY,
 
     temperature=0.3
 
@@ -24,58 +26,46 @@ calculator = CalculatorTool()
 
 
 
-def create_study_agent():
+def create_agent():
 
-
-    agent = Agent(
+    tutor = Agent(
 
         role="AI Study Tutor",
 
         goal="""
-        Help students understand difficult concepts,
-        create study plans, explain topics,
+        Help students learn difficult topics,
+        create study plans,
+        explain concepts,
         and generate quizzes.
         """,
 
         backstory="""
-        You are a friendly expert teacher.
-        You explain concepts step by step.
-        You use simple language,
-        examples and practical explanations.
+        You are a professional teacher.
+        You explain everything step by step.
+        You use simple examples.
         """,
 
         llm=llm,
 
-        tools=[calculator],
+        tools=[
+            calculator
+        ],
 
-        verbose=False
+        verbose=True
 
     )
 
 
-    return agent
+    return tutor
 
 
 
-def ask_tutor(question):
 
 
-    agent=create_study_agent()
+def ask_tutor(question, memory):
 
 
-    previous = get_memory()
-
-
-    context=""
-
-
-    if previous:
-
-        context=f"""
-        Previous conversation:
-
-        {previous}
-        """
+    tutor=create_agent()
 
 
 
@@ -83,30 +73,32 @@ def ask_tutor(question):
 
         description=f"""
 
-        {context}
-
-
-        Student question:
+        Student Question:
 
         {question}
 
 
-        Answer like a professional tutor.
+        Previous Conversation:
 
-        Include:
-        - Simple explanation
-        - Examples
-        - Summary
+        {memory}
+
+
+        Give answer with:
+
+        1. Simple explanation
+        2. Examples
+        3. Short summary
+
 
         """,
 
         expected_output="""
 
-        A clear educational answer.
+        Clear educational answer.
 
         """,
 
-        agent=agent
+        agent=tutor
 
     )
 
@@ -114,14 +106,20 @@ def ask_tutor(question):
 
     crew=Crew(
 
-        agents=[agent],
+        agents=[
+            tutor
+        ],
 
-        tasks=[task],
+        tasks=[
+            task
+        ]
 
     )
 
 
+
     result=crew.kickoff()
+
 
 
     return str(result)
