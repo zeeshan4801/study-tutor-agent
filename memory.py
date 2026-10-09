@@ -1,13 +1,17 @@
-student_memory={}
+conversation_memory = []
 
 
+def save_memory(question, answer):
 
-def save_memory(name,value):
-
-    student_memory[name]=value
+    conversation_memory.append(
+        {
+            "question": question,
+            "answer": answer
+        }
+    )
 
 
 
 def get_memory():
 
-    return student_memory
+    return conversation_memory[-5:]
