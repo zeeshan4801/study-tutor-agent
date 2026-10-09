@@ -3,7 +3,7 @@ import streamlit as st
 
 from agent import ask_tutor
 
-from memory import save_memory, get_memory
+from memory import save_memory,get_memory
 
 
 
@@ -11,9 +11,7 @@ st.set_page_config(
 
     page_title="Study Tutor AI",
 
-    page_icon="📚",
-
-    layout="centered"
+    page_icon="📚"
 
 )
 
@@ -25,12 +23,7 @@ st.markdown(
 
 .stApp{
 
-background:
-linear-gradient(
-135deg,
-#020617,
-#0f172a
-);
+background:#020617;
 
 }
 
@@ -38,36 +31,19 @@ linear-gradient(
 h1{
 
 color:#38bdf8;
-text-align:center;
-
-}
-
-
-.subtitle{
 
 text-align:center;
-color:#94a3b8;
-font-size:20px;
 
 }
 
 
-.stButton button{
+button{
 
-background:#06b6d4;
+background:#06b6d4!important;
 
-color:white;
-
-border-radius:15px;
-
-font-size:18px;
-
-height:45px;
-
-width:160px;
+color:white!important;
 
 }
-
 
 </style>
 
@@ -77,33 +53,11 @@ unsafe_allow_html=True
 
 
 
-st.title(
-"📚 Study Tutor Agent"
-)
-
-
-st.markdown(
-"""
-<div class="subtitle">
-
-Your AI Learning Companion 🚀
-
-</div>
-""",
-unsafe_allow_html=True
-)
-
+st.title("📚 Study Tutor AI")
 
 
 question = st.text_area(
-
-    "Ask your tutor:",
-
-    placeholder=
-    "Example: Explain Newton's law in simple words",
-
-    height=120
-
+"Ask your question"
 )
 
 
@@ -115,42 +69,33 @@ if st.button("Ask Tutor"):
 
 
         with st.spinner(
-            "AI Tutor is thinking..."
+            "Thinking..."
         ):
 
 
-            memory=get_memory()
+            answer = ask_tutor(
 
-
-            answer=ask_tutor(
                 question,
-                memory
+
+                get_memory()
+
             )
 
 
             save_memory(
+
                 question,
+
                 answer
+
             )
 
 
-        st.success("Answer")
-
-        st.write(answer)
-
+        st.success(answer)
 
 
     else:
 
         st.warning(
-            "Please enter a question."
+            "Enter a question"
         )
-
-
-
-st.divider()
-
-
-st.caption(
-"Built with CrewAI + Groq + Streamlit"
-)
