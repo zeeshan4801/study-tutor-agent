@@ -1,9 +1,9 @@
-chat_memory = []
+memory = []
 
 
 def save_memory(question, answer):
 
-    chat_memory.append(
+    memory.append(
         {
             "question": question,
             "answer": answer
@@ -11,7 +11,6 @@ def save_memory(question, answer):
     )
 
 
-
 def get_memory():
 
-    return chat_memory[-5:]
+    return memory[-5:]
