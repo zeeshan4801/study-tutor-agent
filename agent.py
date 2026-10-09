@@ -1,23 +1,51 @@
-from crewai import Agent, Task, Crew
-
 from groq import Groq
 
-from config import get_api_key
+from config import get_groq_key
 
 from tools import CalculatorTool
 
 
 
 client = Groq(
-    api_key=get_api_key()
+    api_key=get_groq_key()
 )
 
 
 
-class GroqLLM:
+calculator = CalculatorTool()
 
 
-    def call(self, prompt):
+
+class StudyTutorAgent:
+
+
+    def run(self, question, history):
+
+
+        prompt = f"""
+
+You are an expert AI Study Tutor.
+
+Student question:
+
+{question}
+
+
+Previous conversation:
+
+{history}
+
+
+Your job:
+
+- Explain simply
+- Give examples
+- Add a short summary
+- Help the student learn
+
+
+"""
+
 
         response = client.chat.completions.create(
 
@@ -26,11 +54,19 @@ class GroqLLM:
             messages=[
 
                 {
+                    "role":"system",
+                    "content":
+                    "You are a helpful study tutor."
+                },
+
+                {
                     "role":"user",
                     "content":prompt
                 }
 
-            ]
+            ],
+
+            temperature=0.3
 
         )
 
@@ -40,98 +76,19 @@ class GroqLLM:
 
 
 
-
-llm = GroqLLM()
-
-
-
-calculator = CalculatorTool()
-
-
-
-def create_agent():
-
-
-    tutor = Agent(
-
-        role="Study Tutor",
-
-        goal="""
-        Teach students clearly.
-        Explain concepts,
-        create quizzes,
-        and make study plans.
-        """,
-
-        backstory="""
-        You are a patient professional teacher.
-        Always explain in simple words.
-        """,
-
-        llm=llm,
-
-        tools=[calculator],
-
-        verbose=False
-
-    )
-
-
-    return tutor
-
-
-
-
-
 def ask_tutor(question, memory):
 
 
-    tutor=create_agent()
+    agent = StudyTutorAgent()
 
 
-    task=Task(
+    answer = agent.run(
 
-        description=f"""
+        question,
 
-        Student question:
-
-        {question}
-
-
-        Previous memory:
-
-        {memory}
-
-
-        Give:
-
-        - Simple explanation
-        - Examples
-        - Summary
-
-        """,
-
-        expected_output="""
-
-        Educational answer
-
-        """,
-
-        agent=tutor
+        memory
 
     )
 
 
-    crew=Crew(
-
-        agents=[tutor],
-
-        tasks=[task]
-
-    )
-
-
-    result=crew.kickoff()
-
-
-    return str(result)
+    return answer
